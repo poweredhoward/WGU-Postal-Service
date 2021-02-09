@@ -55,4 +55,3 @@ class Truck:
 class Stop:
     def __init__(self, address, id):
         self.address = address
-        self.id = id
