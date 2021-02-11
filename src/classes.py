@@ -31,12 +31,15 @@ class Truck:
         self.packages = []
         self.miles_driven = 0
         self.distance_to_next_stop = 0
-        self.next_package = ""
+        self.next_stop = ""
     
     def add_package(self, package):
         if len(self.packages) < 16:
-            if package.id in map(lambda p: p.id, self.packages):
+            if package.id not in map(lambda p: p.id, self.packages):
                 self.packages.append(package)
+                return True
+        return False
+        
     
     def offload_package(self, id):
         self.packages = [ p for p in self.packages if p.id != id]
@@ -49,7 +52,7 @@ class Truck:
     
     def set_next_stop(self, distance, package):
         self.distance_to_next_stop = distance
-        self.next_package = package
+        self.next_stop = package
 
 
 class Stop:

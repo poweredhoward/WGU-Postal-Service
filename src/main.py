@@ -1,5 +1,7 @@
 import csv
-from classes import Package
+from datetime import time
+
+from classes import Package, Truck
 from hash_table import HashTable
 
 def ingest_package_data():
@@ -69,15 +71,18 @@ def ingest_distance_data():
     return packages
             
 
-def trim_stop_name(stop_address):
-    return stop_address.split('\n')[0]
 
 
 def main():
+    truck1 = Truck(1)
+    truck2 = Truck(2)
     list_of_packages = ingest_package_data()
     hashed_packages = HashTable()
     for package in list_of_packages:
+        if not truck1.add_package(package):
+            truck2.add_package(package)
         hashed_packages.add_package(package)
+
     # all_hashed_packages = hashed_packages.get_all_packages()
     # for p in all_hashed_packages:
     #     print(p.id)
@@ -86,7 +91,61 @@ def main():
         
     # print(list_of_packages)
     distances = ingest_distance_data()
+    # print(get_desired_time())
+    # print_all_packages(hashed_packages)
     print("hi")
 
+    # They start at WGU (4001 South 700 East)
+
+
+    # print("hi")
+
+
+# def advance_trucks(truck1, truck2):
+#     if truck1
+
+
+# def get_next_stop(truck):
+
+
+
+def get_desired_time():
+    valid = False
+    selected_time = ""
+    while not valid:
+        try:
+            inputted_time = input("What time would you like to see? (HH:MM)\n")
+            hour, min = map(int, inputted_time.split(':'))
+            if hour < 8:
+                print("Please select a time after 08:00")
+            else:
+                selected_time = time(hour=hour, minute=min)
+                valid = True
+        except:
+            print("Please input a valid time format")
+        
+    return selected_time
+
+
+def print_all_packages(table):
+    packages = table.get_all_packages()
+    for package in packages:
+        if package.delivery_status != 'delivered':
+            print("ID: {}   Address: {}   Status: {}".format(package.id, package.full_address, package.delivery_status))
+        else:
+            print("ID: {}   Address: {}   Status: {} @ {}".format(package.id, package.full_address, package.delivery_status, package.time_delivered))
+
+def print_trucks_mileage(truck1, truck2):
+    print("Miles Driven by Trucks:")
+    print("ID: {}    Miles: {}".format(truck1.id, truck1.miles_driven))
+    print("ID: {}    Miles: {}".format(truck2.id, truck2.miles_driven))
+
+
+def trim_stop_name(stop_address):
+    s = stop_address.split('\n')
+    if len(s) > 1:
+        return s[1]
+    else:
+        return s[0]
 
 main()
