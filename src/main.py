@@ -25,29 +25,6 @@ def ingest_package_data():
             packages.append(p)
     return packages
 
-def ingest_distance_data1():
-    packages = {}
-    with open("../data/distance_table.csv") as file:
-        reader = csv.reader(file, delimiter=',')
-        line = 0
-        column_names = []
-        for row in reader:
-            if line != 0:
-                for stop in row:
-                    # if len(stop) > 10:
-                    #     packages[stop].append()
-                    if len(stop) < 10:
-                        packages
-                    elif stop == '':
-                        break
-                    elif stop == 0:
-                        break
-                        # packages[] = row[0]
-            else:
-                column_names = row
-                for col in column_names:
-                    packages[col] = []
-            line += 1
 
 
 def ingest_distance_data():
@@ -61,12 +38,12 @@ def ingest_distance_data():
 
         for row in dict_reader:
             stop_name = ""
-            for entry in row:
-                if entry == "DISTANCE BETWEEN HUBS IN MILES":
+            for address in row:
+                if address == "DISTANCE BETWEEN HUBS IN MILES":
                     stop_name = trim_stop_name(row["DISTANCE BETWEEN HUBS IN MILES"])
-                elif row[entry] != '' and row[entry] != 0:
-                    packages[stop_name].append((trim_stop_name(entry), row[entry]))
-                    packages[trim_stop_name(entry)].append((stop_name, row[entry]))
+                elif row[address] != '' and row[address] != 0:
+                    packages[stop_name].append((trim_stop_name(address), float(row[address])))
+                    packages[trim_stop_name(address)].append((stop_name, float(row[address])))
         
     return packages
             
@@ -82,6 +59,10 @@ def main():
         if not truck1.add_package(package):
             truck2.add_package(package)
         hashed_packages.add_package(package)
+    
+    truck1.set_next_stop(0, "4001 South 700 East,")
+    truck1.set_next_stop(0, "4001 South 700 East,")
+
 
     # all_hashed_packages = hashed_packages.get_all_packages()
     # for p in all_hashed_packages:
@@ -91,6 +72,12 @@ def main():
         
     # print(list_of_packages)
     distances = ingest_distance_data()
+
+    s = get_next_stop(truck1, distances)
+
+
+
+
     # print(get_desired_time())
     # print_all_packages(hashed_packages)
     print("hi")
@@ -105,7 +92,14 @@ def main():
 #     if truck1
 
 
-# def get_next_stop(truck):
+def get_next_stop(truck, distances):
+    sorted_distances_for_address = sorted(distances[truck.next_stop], key=lambda x: x[1])
+
+    for address, distance in sorted_distances_for_address:
+        if address in truck.addresses and distance > 0:
+            truck.set_next_stop(distance, address)
+            return (distance, address)
+
 
 
 
@@ -144,8 +138,8 @@ def print_trucks_mileage(truck1, truck2):
 def trim_stop_name(stop_address):
     s = stop_address.split('\n')
     if len(s) > 1:
-        return s[1]
+        return s[1].strip()
     else:
-        return s[0]
+        return s[0].strip()
 
 main()
