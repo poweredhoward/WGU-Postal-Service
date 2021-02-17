@@ -24,7 +24,7 @@ class HashTable:
         for id in ids:
             packages.append(self.get_package_by_id(id))
         return packages
-    
+        
 
     def add_package(self, package):
         hash_value = self.__hash(package.id)
