@@ -36,12 +36,14 @@ class Truck:
         self.distance_to_next_stop = 0.0
         self.next_stop = ""
         self.addresses = []
+        self.finished_driving = False
     
     def add_package(self, package):
         if len(self.packages) < 16:
             if package.id not in map(lambda p: p.id, self.packages):
                 self.packages.append(package)
                 self.addresses.append(package.street_address)
+                package.delivery_status = "en route"
                 return True
         return False
         
@@ -53,8 +55,9 @@ class Truck:
             package.time_delivered = datetime.now()
             package.delivery_status = "delivered"
 
-        self.packages = [ p for p in self.packages if p.street_address != address ]
+        self.packages = [ p for p in self.packages if p.street_address != address and p.delivery_status != 'delivered' ]
         self.addresses = [ p.street_address for p in self.packages ]
+
     
     def drive_x_miles(self, miles):
         self.miles_driven += miles

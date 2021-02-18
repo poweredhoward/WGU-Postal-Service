@@ -78,47 +78,75 @@ def main():
 
     while len(truck1.packages) > 0 or len(truck2.packages) > 0:
         # distance_to_drive = abs(truck1.distance_to_next_stop - truck2.distance_to_next_stop)
-        distance_to_drive = abs(min([truck1.distance_to_next_stop, truck2.distance_to_next_stop]))
 
-        if distance_to_drive > 0:
-            if(truck1.drive_x_miles(distance_to_drive) == "Arrived"):
-                # Need to add logic to truck class to offload packages at this address
-                truck1.offload_packages_at_address()
-                if len(truck1.addresses) == 0:
-                    packages_not_picked_up = [ p for p in list_of_packages if p.delivery_status == "at the hub" ]
-                    if len(packages_not_picked_up) == 0:
-                        truck1.next_stop = ""
-                        truck1.distance_to_next_stop = 0.0
-                    else:
-                        # Go back to hub and add more packages
+        distance_to_drive = 0
+        if truck1.finished_driving:
+            print("t1 done")
+            distance_to_drive = truck2.distance_to_next_stop
+            drive_truck(truck2, distance_to_drive, list_of_packages, distances)
 
-                        # for package in packages_not_picked_up:
-                        #     if not truck1.add_package(package):
-                        #         break
-                
-                        truck1.set_next_stop(get_next_stop(truck1, distances))
-            if(truck2.drive_x_miles(distance_to_drive) == "Arrived"):
-                # Need to add logic to truck class to offload packages at this address
-                truck2.offload_packages_at_address()
-                if len(truck2.addresses) == 0:
-                    packages_not_picked_up = [ p for p in list_of_packages if p.delivery_status == "at the hub" ]
-                    if len(packages_not_picked_up) == 0:
-                        truck2.next_stop = ""
-                        truck2.distance_to_next_stop = 0.0
-                    else:
-                        # Go back to hub and add more packages
-                        
-                        # for package in packages_not_picked_up:
-                        #     if not truck2.add_package(package):
-                        #         break
-                
-                        truck2.set_next_stop(get_next_stop(truck2, distances))
+        elif truck2.finished_driving:
+            print("t2 done")
+            distance_to_drive = truck1.distance_to_next_stop
+            drive_truck(truck1, distance_to_drive, list_of_packages, distances)
+
         else:
-            truck1.set_next_stop(get_next_stop(truck1, distances))
-            truck2.set_next_stop(get_next_stop(truck2, distances))
+            distance_to_drive = abs(min([truck1.distance_to_next_stop, truck2.distance_to_next_stop]))
+            drive_truck(truck1, distance_to_drive, list_of_packages, distances)
+            drive_truck(truck2, distance_to_drive, list_of_packages, distances)
+        for truck in [truck1, truck2]:
+            if truck.distance_to_next_stop == 0 and not truck.finished_driving:
+                truck.set_next_stop(get_next_stop(truck, distances))
+
+            # print("distance " + str(distance_to_drive))
+            # truck1.set_next_stop(get_next_stop(truck1, distances))
+            # truck2.set_next_stop(get_next_stop(truck2, distances))
 
 
-        print("distance " +  str(distance_to_drive))
+
+        # if distance_to_drive > 0:
+        #     drive_truck(truck1, distance_to_drive, list_of_packages)
+        #                 # for package in packages_not_picked_up:
+        #                 #     if not truck1.add_package(package):
+        #                 #         break
+                
+        #                 # truck1.set_next_stop(get_next_stop(truck1, distances))
+        #     if(truck2.drive_x_miles(distance_to_drive) == "Arrived"):
+        #         # Need to add logic to truck class to offload packages at this address
+        #         truck2.offload_packages_at_address()
+                
+        #         if len(truck2.packages) == 0:
+        #             packages_not_picked_up = [ p for p in list_of_packages if p.delivery_status == "at the hub" ]
+        #             if len(packages_not_picked_up) == 0:
+        #                 truck2.next_stop = ""
+        #                 truck2.distance_to_next_stop = 0.0
+        #                 truck2.finished_driving = True
+                    
+        #             elif truck2.next_stop == "4001 South 700 East,":
+        #                 for package in packages_not_picked_up:
+        #                     if not truck2.add_package(package):
+        #                         break
+        #                 truck2.set_next_stop(get_next_stop(truck2, distances))
+                        
+        #             else:
+        #                 # Go back to hub and add more packages
+        #                 truck2.set_next_stop({
+        #                     "distance": distances[truck2.next_stop][0][1],
+        #                     "address": "4001 South 700 East,"
+        #                 })
+
+        #                 # for package in packages_not_picked_up:
+        #                 #     if not truck2.add_package(package):
+        #                 #         break
+                
+        #                 # truck2.set_next_stop(get_next_stop(truck2, distances))
+        # else:
+        #     truck1.set_next_stop(get_next_stop(truck1, distances))
+        #     truck2.set_next_stop(get_next_stop(truck2, distances))
+
+
+        print("t1 distance " +  str(truck1.miles_driven))
+        print("t2 distance " +  str(truck2.miles_driven))
         print("t1 " + str(len(truck1.packages)))
         print("t2 " + str(len(truck2.packages)))
 
@@ -143,11 +171,41 @@ def main():
 # def advance_trucks(truck1, truck2):
 #     if truck1
 
+def drive_truck(truck, distance_to_drive, list_of_packages, distances):
+    if(truck.drive_x_miles(distance_to_drive) == "Arrived"):
+        # Need to add logic to truck class to offload packages at this address
+        truck.offload_packages_at_address()
+        if len(truck.packages) == 0:
+            packages_not_picked_up = [ p for p in list_of_packages if p.delivery_status == "at the hub" ]
+            if len(packages_not_picked_up) == 0:
+                truck.next_stop = ""
+                truck.distance_to_next_stop = 0.0
+                truck.finished_driving = True
+                print("Doneeeeeee")
+            
+            elif truck.next_stop == "4001 South 700 East,":
+                for package in packages_not_picked_up:
+                    if not truck.add_package(package):
+                        break
+                truck.set_next_stop(get_next_stop(truck, distances))
+                
+
+            else:
+                # Go back to hub and add more packages
+                truck.set_next_stop({
+                    "distance": distances[truck.next_stop][0][1],
+                    "address": "4001 South 700 East,"
+                })
+                return "Retr"
+            return "Done"
+        return 
+
+
 
 def get_next_stop(truck, distances):
-    # sorted_distances_for_address = sorted(distances[truck.next_stop], key=lambda x: x[1])
-    sorted_distances_for_address = distances[truck.next_stop]
-    print(sorted_distances_for_address)
+    sorted_distances_for_address = sorted(distances[truck.next_stop], key=lambda x: x[1])
+    # sorted_distances_for_address = distances[truck.next_stop]
+    # print(sorted_distances_for_address)
 
     for address, distance in sorted_distances_for_address:
         if address in truck.addresses and distance > 0:
@@ -160,9 +218,6 @@ def get_next_stop(truck, distances):
     print(truck.packages)
     
     # If truck is empty
-
-
-def return_to_hub(truck, distances):
 
 
 
