@@ -54,6 +54,7 @@ class Truck:
         for package in packages_to_offload:
             package.time_delivered = datetime.now()
             package.delivery_status = "delivered"
+            print(str(self.id) + " Offloaded " + package.street_address)
 
         self.packages = [ p for p in self.packages if p.street_address != address and p.delivery_status != 'delivered' ]
         self.addresses = [ p.street_address for p in self.packages ]
