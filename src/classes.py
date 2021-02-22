@@ -36,7 +36,7 @@ class Truck:
     def add_package(self, package, current_time):
         if len(self.packages) < 16:
             if package.id not in map(lambda p: p.id, self.packages):
-                print("{} loaded @ {}".format(package.id, current_time))
+                # print("{} loaded @ {}".format(package.id, current_time))
                 self.packages.append(package)
                 self.addresses.append(package.street_address)
                 package.delivery_status = "en route"
@@ -50,8 +50,7 @@ class Truck:
         for package in packages_to_offload:
             package.time_delivered = current_time
             package.delivery_status = "delivered"
-            print("{} delivered on truck {}".format(package.id, self.id))
-            # print(str(self.id) + " Offloaded " + package.street_address)
+            # print("{} delivered on truck {}".format(package.id, self.id))
 
         self.packages = [ p for p in self.packages if p.street_address != address and p.delivery_status != 'delivered' ]
         self.addresses = [ p.street_address for p in self.packages ]

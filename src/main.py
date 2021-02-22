@@ -53,7 +53,6 @@ def ingest_distance_data():
             
 
 
-
 def main():
     truck1 = Truck(1)
     truck2 = Truck(2)
@@ -65,6 +64,8 @@ def main():
     current_time = datetime.combine(current_day, current_time)
 
     hashed_packages = HashTable()
+    
+    # Add packages to satisfy deadline and special notes requirements
     for package in list_of_packages:
         if package.id in [1, 3, 13, 14, 15, 16, 19, 18, 20, 21, 29, 31, 34, 36, 38, 37]:
             truck2.add_package(package, current_time)
@@ -75,10 +76,11 @@ def main():
     truck1.set_next_stop({'distance': 0, 'address': "4001 South 700 East,"})
     truck2.set_next_stop({'distance': 0, 'address': "4001 South 700 East,"})
 
-
+    # Get user input
     desired_time = get_desired_time()
     desired_package = get_desired_package()
 
+    # Late packages are ones that are delayed on fluight
     picked_up_late_packages = False
     corrected_package_9 = False
 
@@ -97,6 +99,7 @@ def main():
             current_time = current_time + increment_time(distance_to_drive)
             drive_truck(truck1, distance_to_drive, list_of_packages, distances, current_time)
 
+        # Drive trucks a distance so that at least one of them reaches its stop
         else:
             distance_to_drive = abs(min([truck1.distance_to_next_stop, truck2.distance_to_next_stop]))
             current_time = current_time + increment_time(distance_to_drive)
@@ -106,7 +109,7 @@ def main():
         for truck in [truck1, truck2]:
             if truck.distance_to_next_stop == 0 and not truck.finished_driving:
                 if not picked_up_late_packages and current_time.hour >= 9:
-                    print(current_time)
+                    # If after 9:00, go back to the hub and pick up the delayed packages
                     truck.set_next_stop({
                         "distance": distances[truck.next_stop][0][1],
                         "address": "4001 South 700 East,"
@@ -118,13 +121,13 @@ def main():
 
     if desired_package == "All":
         all_packages = hashed_packages.get_all_packages()
-        packages_to_display = [ p for p in all_packages if p.delivery_status == "delivered" and p.time_delivered < desired_time]
-        for pack in packages_to_display:
+        for pack in all_packages:
             print_package(pack.id, hashed_packages)
     else:
         print_package(desired_package, hashed_packages)
 
     print_trucks_mileage(truck1, truck2)
+    print("Current time: {}".format(current_time.strftime("%H:%M")))
 
 
 
@@ -132,6 +135,7 @@ def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_t
     if(truck.drive_x_miles(distance_to_drive) == "Arrived"):
         truck.offload_packages_at_address(current_time)
         
+        # If truck arrived back at the hub, pick up some packages to fill the truck
         if truck.next_stop == "4001 South 700 East,":
             packages_not_picked_up = [ p for p in list_of_packages if p.delivery_status == "at the hub" ]
             for package in packages_not_picked_up:
@@ -146,7 +150,6 @@ def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_t
                 truck.distance_to_next_stop = 0.0
                 truck.finished_driving = True
 
-
             else:
                 # Go back to hub and add more packages
                 truck.set_next_stop({
@@ -154,7 +157,7 @@ def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_t
                     "address": "4001 South 700 East,"
                 })
 
-
+# Finds the nearest available stop to the current stop
 def get_next_stop(truck, distances):
     sorted_distances_for_address = sorted(distances[truck.next_stop], key=lambda x: x[1])
 
@@ -176,7 +179,7 @@ def get_desired_time():
     selected_time = ""
     current_day = datetime.today()
     
-    while not valid and attempts < 3:
+    while not valid and attempts < 2:
         try:
             attempts += 1
             inputted_time = input("What time would you like to see? (HH:MM)\n")
@@ -197,7 +200,7 @@ def get_desired_package():
     valid = False
     attempts = 0
 
-    while not valid and attempts < 3:
+    while not valid and attempts < 2:
         try:
             attempts += 1
             inputted_id = input("What package would you like to see? (Provide its ID, or type 'All')\n")

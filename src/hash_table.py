@@ -7,7 +7,6 @@ class HashTable:
         for i in range(0, self.HASH_SIZE):
             self.table.append([])
 
-    
 
     def get_package_by_id(self, id):
         hash_value = self.__hash(id)
