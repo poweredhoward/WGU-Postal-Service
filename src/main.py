@@ -14,7 +14,6 @@ def ingest_package_data():
         reader = csv.DictReader(file, delimiter=',')
         line = 0
         for r in reader:
-            # print(r)
             p = Package(
                 int(r['ID']),
                 r['Address'],
@@ -49,8 +48,6 @@ def ingest_distance_data():
                     packages[stop_name].append((trim_stop_name(address), float(row[address])))
                     packages[trim_stop_name(address)].append((stop_name, float(row[address])))
             p = packages[stop_name]
-            # packages[stop_name] = sorted(p, key=lambda x: x[1])
-
         
     return packages
             
@@ -70,8 +67,6 @@ def main():
     hashed_packages = HashTable()
     for package in list_of_packages:
         if package.id in [1, 3, 13, 14, 15, 16, 19, 18, 20, 21, 29, 31, 34, 36, 38, 37]:
-        # if package.id in [3, 13, 14, 15, 16, 19, 18, 20, 21, 29, 30, 31, 34, 36, 37, 38]:
-
             truck2.add_package(package, current_time)
         elif package.id not in [6, 9, 25, 28, 32]:
             truck1.add_package(package, current_time)
@@ -81,13 +76,11 @@ def main():
     truck2.set_next_stop({'distance': 0, 'address': "4001 South 700 East,"})
 
 
-
     desired_time = get_desired_time()
     desired_package = get_desired_package()
 
     picked_up_late_packages = False
     corrected_package_9 = False
-
 
     while (not truck1.finished_driving or not truck2.finished_driving) and current_time <= desired_time:
         if not corrected_package_9:
@@ -114,7 +107,6 @@ def main():
             if truck.distance_to_next_stop == 0 and not truck.finished_driving:
                 if not picked_up_late_packages and current_time.hour >= 9:
                     print(current_time)
-                    # TODO: Add logic so that if the truck's destination is ever the hub, load it
                     truck.set_next_stop({
                         "distance": distances[truck.next_stop][0][1],
                         "address": "4001 South 700 East,"
@@ -122,12 +114,7 @@ def main():
                     picked_up_late_packages = True
                 else:
                     truck.set_next_stop(get_next_stop(truck, distances))
-        
-        # print("t1 distance " +  str(truck1.miles_driven))
-        # print("t2 distance " +  str(truck2.miles_driven))
-        # print("t1 " + str(len(truck1.packages)))
-        # print("t2 " + str(len(truck2.packages)))
-        # print(current_time.strftime("%H:%M"))
+
 
     if desired_package == "All":
         all_packages = hashed_packages.get_all_packages()
@@ -143,7 +130,6 @@ def main():
 
 def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_time):
     if(truck.drive_x_miles(distance_to_drive) == "Arrived"):
-        # Need to add logic to truck class to offload packages at this address
         truck.offload_packages_at_address(current_time)
         
         if truck.next_stop == "4001 South 700 East,":
@@ -160,7 +146,6 @@ def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_t
                 truck.distance_to_next_stop = 0.0
                 truck.finished_driving = True
 
-                
 
             else:
                 # Go back to hub and add more packages
@@ -168,31 +153,17 @@ def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_t
                     "distance": distances[truck.next_stop][0][1],
                     "address": "4001 South 700 East,"
                 })
-                return "Retr"
-            return "Done"
-        return 
-
 
 
 def get_next_stop(truck, distances):
     sorted_distances_for_address = sorted(distances[truck.next_stop], key=lambda x: x[1])
-    # sorted_distances_for_address = distances[truck.next_stop]
-    # print(sorted_distances_for_address)
 
     for address, distance in sorted_distances_for_address:
         if address in truck.addresses and distance > 0:
-            # deliver_to_address = True
-            # packages_at_address = package_table.get_packages_at_address(address)
-            # if len(packages_at_address) > 0:
-            #     for package in packages_at_address:
-            #         if package.
-
-            # truck.set_next_stop(distance, address)
             return {
                 "address": address,
                 "distance": distance
             }
-    print("egg")
     
 
 def increment_time(miles):
@@ -265,7 +236,7 @@ def trim_stop_name(stop_address):
         return s[0].strip()
 
 def check_and_correct_package_9(current_time, hashed_packages):
-    # 410 S State St., Salt Lake City, UT 84111
+    # Correct address is 410 S State St., Salt Lake City, UT 84111
     if current_time.hour >= 10 and current_time.minute >= 20:
         p9 = hashed_packages.get_package_by_id(9)
         p9.street_address = "410 S State St"

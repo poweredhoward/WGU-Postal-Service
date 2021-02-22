@@ -19,13 +19,6 @@ class Package:
         return "{} {}, {} {}".format(
             self.street_address, self.city, self.state, self.zip)
         
-    
-    # def update_delivery_status(self, status):
-    #     self.delivery_status = status
-    
-    # def update_time_delivered(self, time):
-    #     self.time_delivered = time
-
 
 
 class Truck:
