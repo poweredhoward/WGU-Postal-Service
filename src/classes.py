@@ -43,7 +43,7 @@ class Truck:
                 return True
         return False
         
-    
+    # Offfloads packages that are destined for the current address
     def offload_packages_at_address(self, current_time):
         address = self.next_stop
         packages_to_offload = [ p for p in self.packages if p.street_address == address ]

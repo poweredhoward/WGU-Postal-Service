@@ -3,6 +3,7 @@ class HashTable:
     HASH_SIZE = 60
     def __init__(self):
         self.table = []
+        # Acts as a quick way to find all packages at a given address
         self.address_to_id_mapping = {}
         for i in range(0, self.HASH_SIZE):
             self.table.append([])

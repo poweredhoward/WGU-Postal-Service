@@ -8,6 +8,7 @@ from hash_table import HashTable
 
 MINUTES_PER_MILE = 3.333
 
+# Create a list of all the packages
 def ingest_package_data():
     packages = []
     with open("../data/package_data.csv") as file:
@@ -29,7 +30,7 @@ def ingest_package_data():
     return packages
 
 
-
+# Create a data structure of all the distances between stops
 def ingest_distance_data():
     packages = {}
     with open("../data/distance_table.csv") as file:
@@ -80,15 +81,15 @@ def main():
     desired_time = get_desired_time()
     desired_package = get_desired_package()
 
-    # Late packages are ones that are delayed on fluight
+    # Late packages are ones that are delayed on flight
     picked_up_late_packages = False
+    # Package 9 needs to be corrected eventually
     corrected_package_9 = False
 
     while (not truck1.finished_driving or not truck2.finished_driving) and current_time <= desired_time:
         if not corrected_package_9:
             corrected_package_9 = check_and_correct_package_9(current_time, hashed_packages)
 
-        distance_to_drive = 0
         if truck1.finished_driving:
             distance_to_drive = truck2.distance_to_next_stop
             current_time = current_time + increment_time(distance_to_drive)
@@ -127,11 +128,12 @@ def main():
         print_package(desired_package, hashed_packages)
 
     print_trucks_mileage(truck1, truck2)
-    print("Current time: {}".format(current_time.strftime("%H:%M")))
+    print("Most recent delivery: {}".format(current_time.strftime("%H:%M")))
 
 
 
 def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_time):
+    # Drive truck specified number of miles
     if(truck.drive_x_miles(distance_to_drive) == "Arrived"):
         truck.offload_packages_at_address(current_time)
         
@@ -145,6 +147,7 @@ def drive_truck(truck, distance_to_drive, list_of_packages, distances, current_t
         
         if len(truck.packages) == 0:
             packages_not_picked_up = [ p for p in list_of_packages if p.delivery_status == "at the hub" ]
+            # Truck is finished driving
             if len(packages_not_picked_up) == 0:
                 truck.next_stop = ""
                 truck.distance_to_next_stop = 0.0
